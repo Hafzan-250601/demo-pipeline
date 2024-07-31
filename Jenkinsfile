@@ -3,19 +3,25 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        sh 'docker build -t devopsapps .'
+        sh '''
+        docker build -t devopsapss .
+        '''
       }
     }
-    stage('Scan') {
+    stage('Scan image using Trivy') {
       steps {
-        sh 'trivy image --format template --template "@contrib/asff.tpl" -o report.asff --exit-code 0 --severity HIGH,CRITICAL,MEDIUM --no-progress devopsapps'
-        sh 'aws securityhub enable-import-findings-for-product --product-arn arn:aws:securityhub:ap-southeast-1::product/aquasecurity/aquasecurity'
+        sh '''
+        trivy image --no-progress --severity HIGH,CRITICAL devopsapss
+        '''
       }
     }
-    stage('Upload Findings to SecurityHub') {
+    stage('Scan image using Snyk') {
       steps {
-        sh 'cat report.asff | jq \'.Findings\''
-        sh 'aws securityhub batch-import-findings --findings report.asff'
+        echo 'Testing...'
+        snykSecurity(
+          snykInstallation: 'SnykImageScanning',
+          snykTokenId: 'organization-snyk-api-token'
+        )
       }
     }
   }
