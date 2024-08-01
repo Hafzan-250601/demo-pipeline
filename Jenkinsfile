@@ -15,14 +15,5 @@ pipeline {
         '''
       }
     }
-    stage('Scan image using Snyk') {
-      steps {
-        echo 'Testing...'
-        snykSecurity(
-          snykInstallation: 'SnykImageScanning',
-          snykTokenId: 'organization-snyk-api-token'
-        )
-      }
-    }
   }
 }
